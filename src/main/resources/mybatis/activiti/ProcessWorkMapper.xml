@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.activiti.mapper.ProcessWorkMapper">
+    
+    <resultMap type="ProcessWork" id="ProcessWorkResult">
+        <result property="id"    column="ID_"    />
+        <result property="rev"    column="REV_"    />
+        <result property="category"    column="CATEGORY_"    />
+        <result property="name"    column="NAME_"    />
+        <result property="key"    column="KEY_"    />
+        <result property="version"    column="VERSION_"    />
+        <result property="deploymentId"    column="DEPLOYMENT_ID_"    />
+        <result property="resourceName"    column="RESOURCE_NAME_"    />
+        <result property="dgrmResourceName"    column="DGRM_RESOURCE_NAME_"    />
+        <result property="description"    column="DESCRIPTION_"    />
+        <result property="hasStartFormKey"    column="HAS_START_FORM_KEY_"    />
+        <result property="hasGraphicalNotation"    column="HAS_GRAPHICAL_NOTATION_"    />
+        <result property="suspensionState"    column="SUSPENSION_STATE_"    />
+        <result property="tenantId"    column="TENANT_ID_"    />
+        <result property="engineVersion"    column="ENGINE_VERSION_"    />
+    </resultMap>
+    
+    <resultMap type="TaskVO" id="TaskVOResult">
+        <result property="curtaskId"    column="ID_"    />
+        <result property="executionId"    column="EXECUTION_ID_"    />
+        <result property="procInstId"    column="PROC_INST_ID_"    />
+        <result property="processDefinitionId"    column="PROC_DEF_ID_"    />
+        <result property="curTaskName"    column="NAME_"    />
+        <result property="curTaskDefKey"    column="TASK_DEF_KEY_"    />
+        <result property="priority"    column="PRIORITY_"    />
+        <result property="createTime"    column="CREATE_TIME_"    />
+        <result property="suspensionState"    column="SUSPENSION_STATE_"    />
+        <result property="curTaskFormKey"    column="FORM_KEY_"    />
+        <result property="actInstName"    column="TEXT_"    />
+        <result property="actName"    column="act_name"    />
+        <result property="reviewId"    column="BUSINESS_KEY_"    />
+    </resultMap>
+    
+    <resultMap type="ProcinstVO" id="ProcinstVOResult">
+        <result property="id"    column="ID_"    />
+        <result property="procInstId"    column="PROC_INST_ID_"    />
+        <result property="businessKey"    column="BUSINESS_KEY_"    />
+        <result property="procDefId"    column="PROC_DEF_ID_"    />
+        <result property="startTime"    column="START_TIME_"    />
+        <result property="endTime"    column="END_TIME_"    />
+        <result property="actInstName"    column="actInstName"    />
+        <result property="curtaskId"    column="curtaskId"    />
+        <result property="curTaskName"    column="curTaskName"    />
+        <result property="curTaskDefKey"    column="TASK_DEF_KEY_"    />
+        <result property="curTaskFormKey"    column="FORM_KEY_"    />
+        <result property="pass"    column="pass"    />
+        <result property="actKey"    column="actKey"    />
+        <result property="actName"    column="actName"    />
+    </resultMap>
+    
+    <resultMap type="User" id="UserResult">
+		<id     property="userId"        column="user_id"         />
+		<result property="deptId"        column="dept_id"         />
+		<result property="loginName"     column="login_name"      />
+		<result property="userName"      column="user_name"       />
+		<result property="userType"      column="user_type"       />
+		<result property="email"         column="email"           />
+		<result property="phonenumber"   column="phonenumber"     />
+		<result property="sex"           column="sex"             />
+		<result property="avatar"        column="avatar"          />
+		<result property="password"      column="password"        />
+		<result property="salt"          column="salt"            />
+		<result property="status"        column="status"          />
+		<result property="delFlag"       column="del_flag"        />
+		<result property="loginIp"       column="login_ip"        />
+		<result property="loginDate"     column="login_date"      />
+		<result property="pwdUpdateDate" column="pwd_update_date" />
+		<result property="createBy"      column="create_by"       />
+		<result property="createTime"    column="create_time"     />
+		<result property="updateBy"      column="update_by"       />
+		<result property="updateTime"    column="update_time"     />
+		<result property="remark"        column="remark"          />
+	</resultMap>
+    
+    <sql id="selectProcessWorkVo">
+        select ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_, SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_
+        from act_re_procdef
+    </sql>
+    
+    <sql id="selectUserVo">
+        select u.user_id, u.dept_id, u.login_name, u.user_name, u.user_type, u.email, u.avatar, u.phonenumber
+		from sys_user u
+    </sql>
+
+    <select id="selectProcessWorkList" parameterType="ProcessWork" resultMap="ProcessWorkResult">
+        <include refid="selectProcessWorkVo"/>
+        <where>  
+            <if test="rev != null "> and REV_ = #{rev}</if>
+            <if test="category != null  and category != ''"> and CATEGORY_ = #{category}</if>
+            <if test="name != null  and name != ''"> and NAME_ = #{name}</if>
+            <if test="key != null  and key != ''"> and KEY_ = #{key}</if>
+            <if test="version != null "> and VERSION_ = #{version}</if>
+            <if test="deploymentId != null  and deploymentId != ''"> and DEPLOYMENT_ID_ = #{deploymentId}</if>
+            <if test="resourceName != null  and resourceName != ''"> and RESOURCE_NAME_ = #{resourceName}</if>
+            <if test="dgrmResourceName != null  and dgrmResourceName != ''"> and DGRM_RESOURCE_NAME_ = #{dgrmResourceName}</if>
+            <if test="description != null  and description != ''"> and DESCRIPTION_ = #{description}</if>
+            <if test="hasStartFormKey != null "> and HAS_START_FORM_KEY_ = #{hasStartFormKey}</if>
+            <if test="hasGraphicalNotation != null "> and HAS_GRAPHICAL_NOTATION_ = #{hasGraphicalNotation}</if>
+            <if test="suspensionState != null "> and SUSPENSION_STATE_ = #{suspensionState}</if>
+            <if test="tenantId != null  and tenantId != ''"> and TENANT_ID_ = #{tenantId}</if>
+            <if test="engineVersion != null  and engineVersion != ''"> and ENGINE_VERSION_ = #{engineVersion}</if>
+        </where>
+    </select>
+    
+    <select id="newestVersionList" parameterType="ProcessWork" resultMap="ProcessWorkResult">
+        <include refid="selectProcessWorkVo"/>
+        <where>
+        	<if test="name != null  and name != ''"> and NAME_ like '%${name}%'</if>
+        	<if test="userId != null and userId != ''">
+	        	and CATEGORY_ in (
+					select act_value from sys_role_act
+					where role_id in (
+						select role_id from sys_user_role where user_id = #{userId}
+					)
+				)
+			</if>
+            and ID_ in (select max(ID_) from act_re_procdef group by KEY_)
+            and KEY_ not in ('npiip', 'npilx')
+        </where>
+        group by KEY_
+    </select>
+    
+    <select id="todoList" parameterType="TaskVO" resultMap="TaskVOResult">
+        SELECT t1.ID_, t1.EXECUTION_ID_, t1.PROC_INST_ID_, t1.PROC_DEF_ID_,
+			t1.NAME_, t1.TASK_DEF_KEY_, t1.PRIORITY_, t1.CREATE_TIME_,
+			t1.SUSPENSION_STATE_, t1.FORM_KEY_,
+			t2.TEXT_,
+			t3.NAME_ 'act_name',
+			t4.BUSINESS_KEY_
+		from act_ru_task t1
+			left join act_hi_varinst t2 on t1.PROC_INST_ID_ = t2.PROC_INST_ID_ and t2.NAME_ = 'actInstName'
+			left join act_re_procdef t3 on t1.PROC_DEF_ID_ = t3.ID_
+			left join act_hi_procinst t4 on t1.PROC_INST_ID_ = t4.PROC_INST_ID_
+		where 1=1
+			and t3.KEY_ not in ('npiip', 'npilx')
+			and t1.ID_ in(
+				select TASK_ID_
+				from act_ru_identitylink
+				where 1=1
+					<if test="userId != null and userId != ''">
+			        	and (
+						(TYPE_ = 'candidate' and USER_ID_ = #{userId})
+						or (TYPE_ = 'candidate' and GROUP_ID_ in (select role_id from sys_user_role where user_id = #{userId}))
+					)
+					</if>
+			)
+			<if test="actInstName != null and actInstName != ''"> and t2.TEXT_ like '%${actInstName}%' </if>
+		order by t1.CREATE_TIME_ desc
+    </select>
+    
+    <select id="todoListSize" parameterType="TaskVO" resultType="long">
+        SELECT count(1)
+		from act_ru_task t1
+			left join act_hi_varinst t2 on t1.PROC_INST_ID_ = t2.PROC_INST_ID_ and t2.NAME_ = 'actInstName'
+			left join act_re_procdef t3 on t1.PROC_DEF_ID_ = t3.ID_
+			left join act_hi_procinst t4 on t1.PROC_INST_ID_ = t4.PROC_INST_ID_
+		where 1=1
+			and t3.KEY_ not in ('npiip', 'npilx')
+			and t1.ID_ in(
+				select TASK_ID_
+				from act_ru_identitylink
+				where 1=1
+					<if test="userId != null and userId != ''">
+			        	and (
+						(TYPE_ = 'candidate' and USER_ID_ = #{userId})
+						or (TYPE_ = 'candidate' and GROUP_ID_ in (select role_id from sys_user_role where user_id = #{userId}))
+					)
+					</if>
+			)
+			<if test="actInstName != null and actInstName != ''"> and t2.TEXT_ like '%${actInstName}%' </if>
+    </select>
+    
+    <select id="doneList" parameterType="ProcinstVO" resultMap="ProcinstVOResult">
+        select t1.ID_, t1.PROC_INST_ID_, t1.BUSINESS_KEY_, t1.PROC_DEF_ID_, t1.START_TIME_, t1.END_TIME_,
+			t2.TEXT_ 'actInstName',
+			t3.ID_ 'curtaskId', t3.NAME_ 'curTaskName', t3.TASK_DEF_KEY_, t3.FORM_KEY_,
+			t4.TEXT_ 'pass',
+			t5.KEY_ 'actKey', t5.NAME_ 'actName'
+		from act_hi_procinst t1
+			left join act_hi_varinst t2 on t1.PROC_INST_ID_ = t2.PROC_INST_ID_ and t2.NAME_ = 'actInstName'
+			left join (
+				select ID_, PROC_DEF_ID_, TASK_DEF_KEY_, PROC_INST_ID_, EXECUTION_ID_,
+					NAME_, PARENT_TASK_ID_, DESCRIPTION_, OWNER_, ASSIGNEE_, START_TIME_,
+					CLAIM_TIME_, END_TIME_, DURATION_, DELETE_REASON_, PRIORITY_, DUE_DATE_,
+					FORM_KEY_, CATEGORY_, TENANT_ID_
+				from act_hi_taskinst
+				where START_TIME_ in (
+					select max(START_TIME_)
+					from act_hi_taskinst
+					group by PROC_INST_ID_
+				)
+			) t3 on t1.PROC_INST_ID_ = t3.PROC_INST_ID_
+			left join act_hi_varinst t4 on t1.PROC_INST_ID_ = t4.PROC_INST_ID_ and t4.NAME_ = 'pass'
+			left join act_re_procdef t5 on t1.PROC_DEF_ID_ = t5.ID_
+		where 1=1
+			and t5.KEY_ not in ('npiip', 'npilx')
+			<if test="userId != null and userId != ''">
+			    and t1.PROC_INST_ID_ in (
+					select PROC_INST_ID_
+					from act_hi_actinst
+					where 1=1
+						and ASSIGNEE_ = #{userId}
+						and END_TIME_ is not null
+				)
+			</if>
+			<if test="procDefId != null and procDefId != ''"> and t1.PROC_DEF_ID_ = '${procDefId}%' </if>
+			<if test="actInstName != null and actInstName != ''"> and t2.TEXT_ like '%${actInstName}%' </if>
+		order by t1.START_TIME_ desc
+    </select>
+    
+    <select id="selectProcessWorkById" parameterType="String" resultMap="ProcessWorkResult">
+        <include refid="selectProcessWorkVo"/>
+        where ID_ = #{id}
+    </select>
+        
+    <insert id="insertProcessWork" parameterType="ProcessWork">
+        insert into act_re_procdef
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">ID_,</if>
+            <if test="rev != null">REV_,</if>
+            <if test="category != null">CATEGORY_,</if>
+            <if test="name != null">NAME_,</if>
+            <if test="key != null and key != ''">KEY_,</if>
+            <if test="version != null">VERSION_,</if>
+            <if test="deploymentId != null">DEPLOYMENT_ID_,</if>
+            <if test="resourceName != null">RESOURCE_NAME_,</if>
+            <if test="dgrmResourceName != null">DGRM_RESOURCE_NAME_,</if>
+            <if test="description != null">DESCRIPTION_,</if>
+            <if test="hasStartFormKey != null">HAS_START_FORM_KEY_,</if>
+            <if test="hasGraphicalNotation != null">HAS_GRAPHICAL_NOTATION_,</if>
+            <if test="suspensionState != null">SUSPENSION_STATE_,</if>
+            <if test="tenantId != null">TENANT_ID_,</if>
+            <if test="engineVersion != null">ENGINE_VERSION_,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="rev != null">#{rev},</if>
+            <if test="category != null">#{category},</if>
+            <if test="name != null">#{name},</if>
+            <if test="key != null and key != ''">#{key},</if>
+            <if test="version != null">#{version},</if>
+            <if test="deploymentId != null">#{deploymentId},</if>
+            <if test="resourceName != null">#{resourceName},</if>
+            <if test="dgrmResourceName != null">#{dgrmResourceName},</if>
+            <if test="description != null">#{description},</if>
+            <if test="hasStartFormKey != null">#{hasStartFormKey},</if>
+            <if test="hasGraphicalNotation != null">#{hasGraphicalNotation},</if>
+            <if test="suspensionState != null">#{suspensionState},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="engineVersion != null">#{engineVersion},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProcessWork" parameterType="ProcessWork">
+        update act_re_procdef
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="rev != null">REV_ = #{rev},</if>
+            <if test="category != null">CATEGORY_ = #{category},</if>
+            <if test="name != null">NAME_ = #{name},</if>
+            <if test="key != null and key != ''">KEY_ = #{key},</if>
+            <if test="version != null">VERSION_ = #{version},</if>
+            <if test="deploymentId != null">DEPLOYMENT_ID_ = #{deploymentId},</if>
+            <if test="resourceName != null">RESOURCE_NAME_ = #{resourceName},</if>
+            <if test="dgrmResourceName != null">DGRM_RESOURCE_NAME_ = #{dgrmResourceName},</if>
+            <if test="description != null">DESCRIPTION_ = #{description},</if>
+            <if test="hasStartFormKey != null">HAS_START_FORM_KEY_ = #{hasStartFormKey},</if>
+            <if test="hasGraphicalNotation != null">HAS_GRAPHICAL_NOTATION_ = #{hasGraphicalNotation},</if>
+            <if test="suspensionState != null">SUSPENSION_STATE_ = #{suspensionState},</if>
+            <if test="tenantId != null">TENANT_ID_ = #{tenantId},</if>
+            <if test="engineVersion != null">ENGINE_VERSION_ = #{engineVersion},</if>
+        </trim>
+        where ID_ = #{id}
+    </update>
+
+    <delete id="deleteProcessWorkById" parameterType="String">
+        delete from act_re_procdef where ID_ = #{id}
+    </delete>
+
+    <delete id="deleteProcessWorkByIds" parameterType="String">
+        delete from act_re_procdef where ID_ in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <update id="updateActHiVarinstByMap">
+		update act_hi_varinst
+		set TEXT_ = #{text}
+		where 1=1
+		<if test="id != null and id != ''"> and ID_ = #{id} </if>
+		<if test="name != null and name != ''"> and NAME_ = #{name} </if>
+		<if test="procInstId != null and procInstId != ''"> and PROC_INST_ID_ = #{procInstId} </if>
+			
+	</update>
+	
+	<select id="getProcInstUserByProcInstId" parameterType="string" resultMap="UserResult">
+		<include refid="selectUserVo"/>
+		where 1=1
+			and u.del_flag = '0'
+			and user_id in (
+				select ASSIGNEE_
+				from act_hi_actinst
+				where 1=1
+					and TASK_ID_ is not null
+					and END_TIME_ is not null
+					and PROC_INST_ID_ = #{value}
+			)
+	</select>
+
+</mapper>

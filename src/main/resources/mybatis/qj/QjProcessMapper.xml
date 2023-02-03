@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.qj.process.mapper.QjProcessMapper">
+    
+    <resultMap type="QjProcess" id="QjProcessResult">
+        <result property="processId"    column="process_id"    />
+        <result property="instanceId"    column="instance_id"    />
+        <result property="status"    column="status"    />
+        <result property="name"    column="name"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectQjProcessVo">
+        select process_id, instance_id, status, name, remark, create_by, create_time from qj_process
+    </sql>
+
+    <select id="selectQjProcessList" parameterType="QjProcess" resultMap="QjProcessResult">
+        <include refid="selectQjProcessVo"/>
+        <where>  
+            <if test="instanceId != null  and instanceId != ''"> and instance_id = #{instanceId}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectQjProcessByProcessId" parameterType="String" resultMap="QjProcessResult">
+        <include refid="selectQjProcessVo"/>
+        where process_id = #{processId}
+    </select>
+        
+    <insert id="insertQjProcess" parameterType="QjProcess">
+        insert into qj_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="processId != null">process_id,</if>
+            <if test="instanceId != null">instance_id,</if>
+            <if test="status != null">status,</if>
+            <if test="name != null">name,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="processId != null">#{processId},</if>
+            <if test="instanceId != null">#{instanceId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="name != null">#{name},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateQjProcess" parameterType="QjProcess">
+        update qj_process
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="instanceId != null">instance_id = #{instanceId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where process_id = #{processId}
+    </update>
+
+    <delete id="deleteQjProcessByProcessId" parameterType="String">
+        delete from qj_process where process_id = #{processId}
+    </delete>
+
+    <delete id="deleteQjProcessByProcessIds" parameterType="String">
+        delete from qj_process where process_id in 
+        <foreach item="processId" collection="array" open="(" separator="," close=")">
+            #{processId}
+        </foreach>
+    </delete>
+
+</mapper>

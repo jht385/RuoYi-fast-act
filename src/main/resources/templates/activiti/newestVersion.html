@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('流程定义')" />
+</head>
+<body class="gray-bg">
+	 <div class="container-div">
+		 <div class="row">
+			 <div class="col-sm-12 search-collapse">
+				 <form id="formId">
+					 <div class="select-list">
+						 <ul>
+							 <li>
+								 <p>名称：</p>
+								 <input type="text" name="name"/>
+							 </li>
+							 <li>
+								 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								 <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							 </li>
+						 </ul>
+					 </div>
+				 </form>
+			 </div>
+
+			 <div class="btn-group-sm" id="toolbar" role="group">
+			 </div>
+			 <div class="col-sm-12 select-table table-striped">
+				 <table id="bootstrap-table" style="word-break:break-all; word-wrap:break-all;"></table>
+			 </div>
+		 </div>
+	 </div>
+
+    <div th:include="include :: footer"></div>
+	<script th:src="@{/js/activiti.js}"></script>
+    <script th:inline="javascript">
+        var prefix = ctx + "activiti";
+
+        $(function() {
+            var options = {
+                url: prefix + "/newestVersionList",
+				removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+				modalName: "流程定义",
+				uniqueId: "id",
+                columns: [
+                	{ checkbox: true },
+					{ field : 'id', title : '流程ID', visible: false },
+					{ field : 'key', title : '流程KEY', visible: false },
+					{ field : 'name', title : '流程名称' },
+					{ field : 'version', title : '版本' },
+					{ field : 'description', title : '流程描述' },
+					{ field : 'category', title : '所属分类' },
+					{ field : 'deploymentTime', title : '部署时间', visible: false },
+					{
+						field: 'dgrmResourceName', align: 'center', title: '流程图',
+						formatter: function(value, row, index) {
+							var url = ctx + 'definition/readResource?pdid=' + row.id + '&resourceName=' + value;
+							return '<a href="' + url + '" target="_blank">查看</a>';
+						}
+					},
+					{
+						title: '操作', align: 'center',
+						formatter: function(value, row, index) {
+							var actions = [];
+							actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="submitApply(\'' + row.id + '\',\'' + row.name + '\',\'' + row.version + '\')"><i class="fa fa-user"></i> 提交申请</a> ');
+							return actions.join('');
+						}
+					}
+				]
+            };
+            $.table.init(options);
+        });
+
+    </script>
+</body>
+</html>

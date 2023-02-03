@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增评审')" />
+    <th:block th:include="include :: select2-css" />
+    <style type="text/css">
+		.select2-container--bootstrap.select2-container--disabled .select2-selection--multiple .select2-selection__choice {
+			background-color: #1AB394;
+		}
+	</style>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="processForm">
+        	<input name="processId" th:value="${processId}" type="hidden">
+        	<input name="instanceId" th:value="${procInstId}" type="hidden">
+        	<input name="taskId" th:value="${taskId}" type="hidden">
+        	<input name="nextDept" type="hidden">
+        	<h4 class="form-header h4">请假详情</h4>
+            <div class="form-group">    
+                <label class="col-sm-1 control-label">名字：</label>
+                <div class="col-sm-3">
+                    <input name="name" class="form-control m-b n1" type="text" th:readonly="${node != 'n1'}" autocomplete="off" th:value="${ beanInfo != null ? beanInfo.name : ''}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">描述：</label>
+                <div class="col-sm-11">
+                    <textarea name="remark" class="form-control m-b n1" th:readonly="${node != 'n1'}" th:text="${ beanInfo != null ? beanInfo.remark : ''}"></textarea>
+                </div>
+            </div>
+			<h4 class="form-header h4">附件列表</h4>
+			<div class="form-group">
+				<div class="btn-group-sm" id="fileToolbar" role="group" th:style="${action == 'view' ? 'display: none' : ''}">
+		            <div class="text-center">
+		            	<button type="button" class="btn btn-primary" id="uploadFile">上传附件</button>
+					</div>
+		        </div>
+		        <div class="col-sm-12 select-table table-bordered">
+					<table id="fileTable"></table>
+				</div>
+	        </div>
+			<h4 class="form-header h4">评审历史</h4>
+			<div class="form-group">
+		        <div class="col-sm-12 select-table table-bordered">
+					<table id="historyTable"></table>
+				</div>
+	        </div>
+	        <h4 class="form-header h4" th:style="${action == 'new' or action == 'handle' ? '' : 'display: none'}" >评审区</h4>
+	        <div class="form-group" th:style="${action != 'handle' ? 'display: none' : ''}">
+				<label class="col-sm-1 control-label">结论：</label>
+				<div class="col-sm-11">
+					<div class="radio-box" th:each="dict : ${@dict.getType('act_012')}">
+						<input id="pass" name="pass" type="radio" th:value="${dict.dictValue}" th:checked="${dict.default}">
+						<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" th:style="${action == 'new' or action == 'handle' ? '' : 'display: none'}" >    
+            	<label class="col-xs-1 control-label">通知人员：</label>
+				<div class="col-xs-11">
+					<select id="nextUser" name="nextUser" class="form-control select2-multiple" multiple>
+						<option th:each="user:${users}" th:value="${user.userId}" th:text="${user.userName}"></option>
+					</select>
+				</div>
+            </div>
+	        <div class="form-group n3" th:style="${action == 'new' or action == 'handle' ? '' : 'display: none'}" >    
+                <label class="col-sm-1 control-label">意见：</label>
+                <div class="col-sm-11">
+                    <textarea id="nextMsg" name="nextMsg" class="form-control m-b" rows="5"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <script th:src="@{/js/activiti.js}"></script>
+    <script th:inline="javascript">
+        var
+        	processId = [[${processId}]],
+        	procInstId = [[${procInstId}]],
+        	taskId = [[${taskId}]],
+        	actFormName = [[${name}]],
+        	action = [[${action}]],
+        	beanInfo = [[${beanInfo}]],
+        	ref = 'qj',
+        	fileTableOptions,
+        	historyTableOptions,
+        	validateRules,
+        	validateMessages,
+        	node = [[${node}]], // 当前进行到的节点
+        	processFormUrl,
+        	showYn = 0;
+        	curloginName = [[${@permission.getPrincipalProperty('loginName')}]]
+        ;
+        
+        $(function() {
+        	
+        	if(action == 'new'){
+        		validateRules = {
+        			name:{ maxlength: 90, required: true },
+        			remark:{ maxlength: 450, required: true },
+               		nextUser:{ required: true },
+               		nextMsg:{ maxlength: 1000, required: true },
+               	};
+        		validateMessages = {
+                	//"customerCode": { required: "必填项" } // 对应rules的key写value就是提示信息，不写也有默认的
+                };
+        		
+        		processFormUrl = ctx + "qj/process/processFormStart";
+        	}else if(action == 'handle'){
+        		showYn = 1;
+        		
+        		if(node === 'n2'){
+        			validateRules = {
+            			nextUser:{ required: true },
+            			nextMsg:{ maxlength: 1000, required: true },
+					};
+        		}else{
+        			validateRules = {
+               			nextUser:{ required: true },
+               			nextMsg:{ maxlength: 1000, required: true },
+   					};
+        		}
+        		
+				validateMessages = {
+					//"customerCode": { required: "必填项" } // 对应rules的key写value就是提示信息，不写也有默认的
+				};
+				
+				processFormUrl = ctx + "qj/process/handle";
+        	}else if(action == 'view'){
+        		
+        	}else if(action == 'edit'){
+        		validateRules = {
+       				name:{ maxlength: 90, required: true },
+           			remark:{ maxlength: 450, required: true },
+           			nextUser:{ required: true },
+           			nextMsg:{ maxlength: 1000, required: true },
+				};
+        		
+        		validateMessages = {
+   					//"customerCode": { required: "必填项" } // 对应rules的key写value就是提示信息，不写也有默认的
+   				};
+        		
+        		processFormUrl = ctx + "qj/process/processFormEdit";
+        		
+        		$(".n1").removeAttr('readonly');
+        	}else{
+        		$.modal.alertError('action信息不对：' + action);
+        		$.modal.close();
+        	}
+        	
+        	$("#uploadFile").click(function(){
+    			let options = {
+    				title: '上传附件', width: window.innerWidth, height: window.innerHeight,
+    				url: "/system/file/multipleFile?ref="+ ref + "&refId=" + processId,
+    				btn: ['<i class="fa fa-close"></i> 关闭'],
+    				callBack: function(index, layero){
+    				    $.modal.close(index);
+    				    $.table.refresh('fileTable');
+    				}
+    			};
+    			$.modal.openOptions(options);
+    	    })
+    	    
+    	    function fileTableParams(params) {
+				var search = $.table.queryParams(params);
+				search.ref = ref;
+				search.refId = processId;
+				return search;
+			}
+            
+            fileTableOptions = {
+            	id: 'fileTable',
+                url: "/system/file/list",
+                queryParams: fileTableParams,
+                removeUrl: "/system/file/bizRemove",
+                modalName: "文件记录",
+                showSearch: false, showToggle: false, showColumns: false,
+                toolbar: 'fileToolbar', // 默认'toolbar'，页面有两个table会绑定到最后$.table.init的table处
+                columns: [
+                	{ checkbox: true },
+	                { field: 'fileId', title: '文件id', visible: false, },
+	                { field: 'fileName', title: '文件名' },
+	                { field: 'fileType', title: '文件类型' },
+	                {
+					    title: '预览',
+					    formatter: function(value, row, index) {
+					    	// 图片预览（注意：如存储在本地直接获取数据库路径，如有配置context-path需要使用ctx+路径）
+					    	// 如：/profile/upload/2019/08/08/3b7a839aced67397bac694d77611ce72.png
+					    	if(!row.type || row.type.indexOf('image') == -1){
+				    			return "<a target='_blank' href='/common/download/resource?resource="+ row.url +"'>查看</a>";
+					    	}else{
+					    		return $.table.imageView("/common/download/resource?resource="+ row.url, '', '', 'blank');
+					    	}
+					    }
+					},
+					{ field: 'createTime', title: '创建时间' },
+	                { field: 'createBy', title: '创建人' },
+	                {
+	                    title: '操作', align: 'center',
+	                    formatter: function(value, row, index) {
+	                        var actions = [];
+	                        if(action === 'new'){
+	                        	if(curloginName === row.createBy){
+			                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="fileRemove(\'' + row.fileId + '\')"><i class="fa fa-remove"></i>删除</a>');
+		                        }
+	                        }else if(action === 'handle'){
+	                        	if(curloginName === row.createBy){
+			                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="fileRemove(\'' + row.fileId + '\')"><i class="fa fa-remove"></i>删除</a>');
+		                        }
+	                        }else if(action === 'view'){
+	                        	
+	                        }
+	                        
+	                        return actions.join('');
+	                    }
+	                }
+	            ]
+            };
+            
+            function historyTableParams(params) {
+				var search = $.table.queryParams(params);
+				search.instanceId = procInstId;
+				return search;
+			}
+            
+            historyTableOptions = {
+            	id: 'historyTable',
+   		        url: ctx + "process/listHistory",
+   		        queryParams: historyTableParams,
+   		        sortName: "createTime", sortOrder: "desc", modalName: "审批历史",
+   		        showSearch: false, showRefresh: false, showToggle: false, showColumns: false, clickToSelect: false, rememberSelected: false, pagination: false,
+   		        columns: [
+   			        { field: 'activityId', title: '活动ID', visible: false },
+   			        { field: 'activityName', title: '节点' },
+   			        { field: 'assignee', title: '处理人', visible: true },
+   					{ field: 'assigneeName', title: '处理人名' },
+   					//{ field: 'comment', title: '审批意见' },
+   					{ field: 'description', title: '审批意见' },
+   			        { field: 'startTime', title: '开始时间' },
+   					{ field: 'endTime', title: '结束时间' },
+   					{
+   						field: 'durationInMillis', title: '耗时',
+   						formatter: function(value, row, index) {
+   							if (!value)
+   								return '未知';
+   							return formatTotalDateSub(value / 1000);
+   						}
+   					}
+   				]
+   		    };
+   		 	$.table.init(fileTableOptions);
+   		    $.table.init(historyTableOptions);
+            
+            $("#processForm").validate({
+            	onkeyup: false,
+            	rules: validateRules,
+               	messages: validateMessages,
+                focusCleanup: true
+            });
+        });
+        
+        function submitHandler() {
+            if ($.validate.form()) {
+            	/*
+            	var totalRows = $("#fileTable").bootstrapTable("getOptions").totalRows;
+           		if (totalRows < 1) {
+           			$.modal.alertWarning("请上传附件");
+           			return;
+           		}
+            	*/
+           		
+           		if(node == 'n1' && $('#pass:checked').val() == '2'){
+           			$.modal.alertWarning('这里不能返回');
+           			return;
+           		}
+           		
+            	// 调用通用的下结论界面，表单内即可去掉下结论部分
+            	/*
+            	$.modal.openOptions({
+            		title: '意见',
+            		url: "/activiti/nextMsg?showYn="+ showYn +"&deptFlag=1&userFlag=1",
+            		callBack: function(index, layero){
+            			let body = $.modal.getChildFrame(index);
+            			
+            			$("input[name='nextDept']").val(body.find('#nextDept').val());
+            			$("input[name='nextUser']").val(body.find('#nextUser').val());
+            			$("input[name='nextMsg']").val(body.find('#nextMsg').val());
+            			$("input[name='pass']").val(body.find('#pass:checked').val());
+            			$.modal.close(index);
+            			
+            			let formSer = $('#processForm').serialize();
+                    	//console.log(formSer);
+                    	
+            			$.operate.save(processFormUrl, formSer);
+            		}
+            	});
+            	*/
+            	
+            	let formSer = $('#processForm').serialize();
+            	//console.log(formSer);
+            	
+    			$.operate.save(processFormUrl, formSer);
+            }
+        }
+        
+        function fileRemove(fileIds){
+        	$.modal.confirm("确定要删除吗?", function() {
+	        	$.operate.post(fileTableOptions.removeUrl, {
+	        		ids: fileIds
+	        	}, function(res){
+	        	});
+	    	});
+        }
+        
+    </script>
+</body>
+</html>

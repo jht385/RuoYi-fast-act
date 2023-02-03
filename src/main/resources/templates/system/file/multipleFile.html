@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增文件记录')" />
+    <th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-file-add">
+        	<div class="form-group">
+				<label class="font-noraml">多文件上传</label>
+				<div class="file-loading">
+					<input id="multipleFile" name="files" type="file" multiple>
+				</div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js" />
+    <script th:inline="javascript">
+        var fileId = $("input[name='fileId']").val();
+        var ref = [[${ref}]];
+        var refId = [[${refId}]];
+        
+        $("#multipleFile").fileinput({
+            uploadUrl: ctx + 'common/uploads',
+            uploadAsync: false
+        }).on('filebatchuploadsuccess', function (event, data, previewId, index) {
+        	var files = data.files; // 上传的文件信息
+        	/*
+        	0: File {name: '1.docx', lastModified: 1639040469382, lastModifiedDate: Thu Dec 09 2021 17:01:09 GMT+0800 (中国标准时间), webkitRelativePath: '', size: 11290, …}
+        	1: File {name: '1.pdf', lastModified: 1408781650000, lastModifiedDate: Sat Aug 23 2014 16:14:10 GMT+0800 (中国标准时间), webkitRelativePath: '', size: 266890, …}
+        	2: File {name: '1.TXT', lastModified: 1625037883457, lastModifiedDate: Wed Jun 30 2021 15:24:43 GMT+0800 (中国标准时间), webkitRelativePath: '', size: 3, …}
+			*/
+        	var rsp = data.response; // 回调
+        	/*
+        	code: 0
+			fileNames: "/profile/upload/2022/02/15/b6bb2c6f-91e5-4af0-9338-219a050531bd.docx,/profile/upload/2022/02/15/688c9339-3979-4e95-acab-8474eda91229.pdf,/profile/upload/2022/02/15/cdce113c-b574-4f0f-844f-03ea46640a39.TXT,/profile/upload/2022/02/15/93538774-b3a5-4c38-9520-c2a535f992ec.xls"
+			msg: "操作成功"
+			urls: "http://localhost/profile/upload/2022/02/15/b6bb2c6f-91e5-4af0-9338-219a050531bd.docx,http://localhost/profile/upload/2022/02/15/688c9339-3979-4e95-acab-8474eda91229.pdf,http://localhost/profile/upload/2022/02/15/cdce113c-b574-4f0f-844f-03ea46640a39.TXT,http://localhost/profile/upload/2022/02/15/93538774-b3a5-4c38-9520-c2a535f992ec.xls"
+        	*/
+        	
+        	if(rsp.code === 0){
+        		var fs = [];
+        		var fileNameArr = rsp.fileNames.split(",");
+        		for(let i = 0; i < files.length; i++){
+        			files[i].url = fileNameArr[i];
+        			files[i].fileName = files[i].name;
+        			files[i].isCopy = 0;
+        			files[i].ref = ref;
+        			files[i].refId = refId;
+        			files[i].fileType = files[i].type;
+        			fs.push(files[i]);
+        		}
+        		
+        		var postData = {
+					"ref": ref,
+              		"refId": refId,
+					"filesStr": JSON.stringify(fs)
+              	};
+        		
+        		$.operate.post(
+               		"/system/file/multipleFile", postData,
+               		function(data){
+               		}
+               	);
+        	}else{
+        		$.modal.alert(rsp.msg);
+        	}
+        }).on('fileremoved', function (event, id, index) {
+            $("input[name='" + event.currentTarget.id + "']").val('')
+        })
+    </script>
+</body>
+</html>

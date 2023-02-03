@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改文件记录')" />
+    <th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    	<!-- 修改，权限都放给管理员，应该是啥都能改 -->
+        <form class="form-horizontal m" id="form-file-edit" th:object="${file}">
+            <input name="fileId" th:field="*{fileId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">文件名：</label>
+                <div class="col-sm-8">
+                    <input name="fileName" th:field="*{fileName}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">文件类型：</label>
+                <div class="col-sm-8">
+                    <input name="fileType" th:field="*{fileType}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">URL地址：</label>
+                <div class="col-sm-8">
+                    <input name="url" th:field="*{url}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否复制：</label>
+                <div class="col-sm-8">
+                	<select name="isCopy" class="form-control m-b" th:with="type=${@dict.getType('sys_yes_no')}">
+		                <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="*{isCopy}"></option>
+		            </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">关联业务：</label>
+                <div class="col-sm-8">
+                    <input name="ref" th:field="*{ref}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">业务主键：</label>
+                <div class="col-sm-8">
+                    <input name="refId" th:field="*{refId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <div class="ibox-content">
+                   	<div class="form-group">
+                    	<label class="font-noraml">单文件上传</label>
+	                    <div class="file-loading">
+					    	<input id="singleFile" name="file" type="file">
+					    </div>
+               		</div>
+               </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/file";
+        var file = [[${file}]];
+        
+        $("#form-file-edit").validate({
+        	onkeyup: false,
+        	rules:{
+        		fileName:{
+        			maxlength: 100,
+        			required: true
+        		},
+        		fileType:{
+        			minlength: 1,
+        			maxlength: 200,
+        			required: true
+        		},
+        		url:{
+        			minlength: 5,
+        			maxlength: 200,
+        			required: true
+        		},
+        		isCopy:{
+        			required: true
+        		},
+        		ref:{
+        			minlength: 1,
+        			maxlength: 50,
+        		},
+        		refId:{
+        			minlength: 1,
+        			maxlength: 36,
+        		},
+        	},
+        	messages: {
+            },
+            focusCleanup: true
+        });
+        
+        $("#singleFile").fileinput({
+            uploadUrl: ctx + 'common/upload',
+            deleteUrl: '',
+            maxFileCount: 1,
+            autoReplace: true,
+            maxFileSize: 1024 * 20,
+	        initialPreview: [ file.url ],
+	        initialPreviewAsData: true,
+	        initialPreviewConfig: [
+	            {caption: file.fileName, downloadUrl: file.url, width: "120px", key: file.fileId}
+	        ],
+	        layoutTemplates :{
+	        	actionDelete: '', //去除上传预览的缩略图中的删除图标
+	        	//actionUpload: '', //去除上传预览缩略图中的上传图片图标；
+	        	//actionZoom: '' //去除上传预览缩略图中的查看详情预览的缩略图标。
+	        },
+        }).on('fileuploaded', function (event, data, previewId, index) {
+        	var rsp = data.response;
+            
+            $("input[name='fileName']").val(data.files[0].name);
+            $("input[name='fileType']").val(data.files[0].type);
+            $("input[name='url']").val(rsp.fileName);
+        }).on('filesuccessremove', function (event, id, index) {
+            $("input[name='" + event.currentTarget.id + "']").val('')
+            
+            removeFile();
+        }).on('filecleared', function (event, id, index) {
+            $("input[name='" + event.currentTarget.id + "']").val('')
+            
+            removeFile();
+        })
+        
+        //$("#singleFile").fileinput('_initFileActions');
+        
+        function removeFile(){
+        	$("input[name='fileName']").val('');
+            $("input[name='fileType']").val('');
+            $("input[name='url']").val('');
+        }
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-file-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

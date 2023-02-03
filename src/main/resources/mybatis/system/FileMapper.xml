@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.file.mapper.FileMapper">
+    
+    <resultMap type="File" id="FileResult">
+        <result property="fileId"    column="file_id"    />
+        <result property="fileType"    column="file_type"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="url"    column="url"    />
+        <result property="isCopy"    column="is_copy"    />
+        <result property="ref"    column="ref"    />
+        <result property="refId"    column="ref_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectFileVo">
+        select file_id, file_type, file_name, url, is_copy, ref, ref_id, create_by, create_time from sys_file
+    </sql>
+
+    <select id="selectFileList" parameterType="File" resultMap="FileResult">
+        <include refid="selectFileVo"/>
+        <where>  
+            <if test="fileType != null  and fileType != ''"> and file_type = #{fileType}</if>
+            <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
+            <if test="url != null  and url != ''"> and url = #{url}</if>
+            <if test="isCopy != null  and isCopy != ''"> and is_copy = #{isCopy}</if>
+            <if test="ref != null  and ref != ''"> and ref like concat('%', #{ref}, '%')</if>
+            <if test="refId != null  and refId != ''"> and ref_id = #{refId}</if>
+        </where>
+    </select>
+    
+    <select id="selectFileByFileId" parameterType="String" resultMap="FileResult">
+        <include refid="selectFileVo"/>
+        where file_id = #{fileId}
+    </select>
+        
+    <insert id="insertFile" parameterType="File">
+        insert into sys_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileId != null">file_id,</if>
+            <if test="fileType != null">file_type,</if>
+            <if test="fileName != null">file_name,</if>
+            <if test="url != null">url,</if>
+            <if test="isCopy != null">is_copy,</if>
+            <if test="ref != null">ref,</if>
+            <if test="refId != null">ref_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileId != null">#{fileId},</if>
+            <if test="fileType != null">#{fileType},</if>
+            <if test="fileName != null">#{fileName},</if>
+            <if test="url != null">#{url},</if>
+            <if test="isCopy != null">#{isCopy},</if>
+            <if test="ref != null">#{ref},</if>
+            <if test="refId != null">#{refId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFile" parameterType="File">
+        update sys_file
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fileType != null">file_type = #{fileType},</if>
+            <if test="fileName != null">file_name = #{fileName},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="isCopy != null">is_copy = #{isCopy},</if>
+            <if test="ref != null">ref = #{ref},</if>
+            <if test="refId != null">ref_id = #{refId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where file_id = #{fileId}
+    </update>
+
+    <delete id="deleteFileByFileId" parameterType="String">
+        delete from sys_file where file_id = #{fileId}
+    </delete>
+    
+    <delete id="deleteFileByFileIds" parameterType="String">
+        delete from sys_file where file_id in 
+        <foreach item="fileId" collection="array" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+    </delete>
+    
+	<insert id="batchAddFile">
+		insert into sys_file(file_id, file_type, file_name, url, is_copy, ref, ref_id, create_by, create_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.fileId},#{item.fileType},#{item.fileName},#{item.url},#{item.isCopy},#{item.ref},#{item.refId},#{item.createBy},#{item.createTime})
+		</foreach>
+	</insert>
+	
+</mapper>

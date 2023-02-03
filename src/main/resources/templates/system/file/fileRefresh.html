@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增文件记录')" />
+    <th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-file-add">
+        	<div class="form-group">
+				<label class="font-noraml">单文件上传</label>
+				<div class="file-loading">
+					<input id="singleFile" name="file" type="file">
+				</div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js" />
+    <script th:inline="javascript">
+        var oldFileId = [[${oldFileId}]];
+        var newRef = [[${newRef}]];
+        
+        $("#singleFile").fileinput({
+            uploadUrl: ctx + 'common/upload',
+            maxFileCount: 1,
+            autoReplace: true
+        }).on('fileuploaded', function (event, data, previewId, index) {
+        	var rsp = data.response;
+        	
+        	if(rsp.code === 0){
+        		var postData = {
+					"fileId": oldFileId,
+              		"fileName": data.files[0].name,
+              		"fileType": data.files[0].type,
+              		"fileName": rsp.originalFilename,
+              		"url": rsp.fileName,
+					"isCopy": 0,
+					"ref": newRef,
+              	};
+        		
+        		$.operate.post(
+               		"/system/file/fileRefresh", postData,
+               		function(data){
+               		}
+               	);
+        	}else{
+        		$.modal.alert(rsp.msg);
+        	}
+        }).on('fileremoved', function (event, id, index) {
+            $("input[name='" + event.currentTarget.id + "']").val('')
+        })
+        
+    </script>
+</body>
+</html>

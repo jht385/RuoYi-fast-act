@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.role.mapper.RoleActMapper">
+    
+    <resultMap type="RoleAct" id="RoleActResult">
+        <result property="id"    column="id"    />
+        <result property="roleId"    column="role_id"    />
+        <result property="actValue"    column="act_value"    />
+    </resultMap>
+
+    <sql id="selectRoleActVo">
+        select id, role_id, act_value from sys_role_act
+    </sql>
+
+    <select id="selectRoleActList" parameterType="RoleAct" resultMap="RoleActResult">
+        <include refid="selectRoleActVo"/>
+        <where>  
+            <if test="roleId != null  and roleId != ''"> and role_id = #{roleId}</if>
+            <if test="actValue != null  and actValue != ''"> and act_value = #{actValue}</if>
+        </where>
+    </select>
+    
+    <select id="selectRoleActById" parameterType="Long" resultMap="RoleActResult">
+        <include refid="selectRoleActVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertRoleAct" parameterType="RoleAct">
+        insert into sys_role_act
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="actValue != null">act_value,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="roleId != null">#{roleId},</if>
+            <if test="actValue != null">#{actValue},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRoleAct" parameterType="RoleAct">
+        update sys_role_act
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="actValue != null">act_value = #{actValue},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRoleActById" parameterType="Long">
+        delete from sys_role_act where id = #{id}
+    </delete>
+
+    <delete id="deleteRoleActByIds" parameterType="String">
+        delete from sys_role_act where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <insert id="batchRoleAct">
+		insert into sys_role_act(id, role_id, act_value) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.id},#{item.roleId},#{item.actValue})
+		</foreach>
+	</insert>
+	
+	<delete id="deleteRoleActByRoleId" parameterType="Long">
+		delete from sys_role_act where role_id=#{roleId}
+	</delete>
+	
+	<delete id="deleteRoleAct" parameterType="Long">
+ 		delete from sys_role_act where role_id in
+ 		<foreach collection="array" item="roleId" open="(" separator="," close=")">
+ 			#{roleId}
+        </foreach> 
+ 	</delete>
+
+</mapper>
