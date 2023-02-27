@@ -118,7 +118,6 @@ public class DictTypeServiceImpl implements IDictTypeService
      * 批量删除字典类型
      * 
      * @param ids 需要删除的数据
-     * @return 结果
      */
     @Override
     public void deleteDictTypeByIds(String ids)
@@ -217,15 +216,15 @@ public class DictTypeServiceImpl implements IDictTypeService
      * @return 结果
      */
     @Override
-    public String checkDictTypeUnique(DictType dict)
+    public boolean checkDictTypeUnique(DictType dict)
     {
         Long dictId = StringUtils.isNull(dict.getDictId()) ? -1L : dict.getDictId();
         DictType dictType = dictTypeMapper.checkDictTypeUnique(dict.getDictType());
         if (StringUtils.isNotNull(dictType) && dictType.getDictId().longValue() != dictId.longValue())
         {
-            return UserConstants.DICT_TYPE_NOT_UNIQUE;
+            return UserConstants.NOT_UNIQUE;
         }
-        return UserConstants.DICT_TYPE_UNIQUE;
+        return UserConstants.UNIQUE;
     }
 
     /**

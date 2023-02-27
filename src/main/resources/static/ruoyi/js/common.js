@@ -68,6 +68,7 @@ $(function() {
                         endLayDate.config.min.month = '';
                         endLayDate.config.min.date = '';
                     }
+                    $('#endTime').trigger('click');
                 }
             });
             endLayDate = laydate.render({
@@ -383,6 +384,32 @@ function checkpwd(chrtype, password) {
     return true;
 }
 
+/** 开始时间/时分秒 */
+function beginOfTime(date) {
+    if($.common.isNotEmpty(date)) {
+        return $.common.sprintf("%s 00:00:00", date);
+    }
+}
+
+/** 结束时间/时分秒 */
+function endOfTime(date) {
+    if($.common.isNotEmpty(date)) {
+        return $.common.sprintf("%s 23:59:59", date);
+    }
+}
+
+/** 重置日期/年月日 */
+function resetDate() {
+	if ($.common.isNotEmpty(startLayDate) && $.common.isNotEmpty(endLayDate)) {
+	    endLayDate.config.min.year = '';
+	    endLayDate.config.min.month = '';
+	    endLayDate.config.min.date = '';
+	    startLayDate.config.max.year = '2099';
+	    startLayDate.config.max.month = '12';
+	    startLayDate.config.max.date = '31';
+	}
+}
+
 // 日志打印封装处理
 var log = {
     log: function(msg) {
@@ -428,7 +455,7 @@ var sub = {
 		var data = $("#" + table.options.id).bootstrapTable('getData');
     	var count = data.length;
     	for (var dataIndex = 0; dataIndex < count; dataIndex++) {
-    	    var columns = $('#' + table.options.id + ' tr[data-index="' + dataIndex + '"] td');
+    	    var columns = $('#' + table.options.id + ' tr[data-index="' + dataIndex + '"] td:visible');
     	    var obj = new Object();
     	    for (var i = 0; i < columns.length; i++) {
     	        var inputValue = $(columns[i]).find('input');

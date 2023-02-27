@@ -11,7 +11,7 @@
  Target Server Version : 50728
  File Encoding         : 65001
 
- Date: 17/02/2023 17:03:06
+ Date: 27/02/2023 10:34:26
 */
 
 SET NAMES utf8mb4;
@@ -1063,7 +1063,7 @@ CREATE TABLE `sys_config`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`config_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '参数配置表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '参数配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_config
@@ -1078,6 +1078,7 @@ INSERT INTO `sys_config` VALUES (7, '用户管理-账号密码更新周期', 'sy
 INSERT INTO `sys_config` VALUES (8, '主框架页-菜单导航显示风格', 'sys.index.menuStyle', 'default', 'Y', 'admin', '2022-01-24 14:31:50', '', NULL, '菜单导航显示风格（default为左侧导航菜单，topnav为顶部导航菜单）');
 INSERT INTO `sys_config` VALUES (9, '主框架页-是否开启页脚', 'sys.index.footer', 'true', 'Y', 'admin', '2022-01-24 14:31:50', '', NULL, '是否开启底部页脚显示（true显示，false隐藏）');
 INSERT INTO `sys_config` VALUES (10, '主框架页-是否开启页签', 'sys.index.tagsView', 'true', 'Y', 'admin', '2022-01-24 14:31:50', '', NULL, '是否开启菜单多页签显示（true显示，false隐藏）');
+INSERT INTO `sys_config` VALUES (11, '用户登录-黑名单列表', 'sys.login.blackIPList', '', 'Y', 'admin', '2023-02-27 10:03:32', '', NULL, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）');
 
 -- ----------------------------
 -- Table structure for sys_dept
@@ -1289,16 +1290,14 @@ CREATE TABLE `sys_logininfor`  (
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '登录状态（0成功 1失败）',
   `msg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '提示消息',
   `login_time` datetime NULL DEFAULT NULL COMMENT '访问时间',
-  PRIMARY KEY (`info_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`info_id`) USING BTREE,
+  INDEX `idx_sys_logininfor_s`(`status`) USING BTREE,
+  INDEX `idx_sys_logininfor_lt`(`login_time`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 100 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_logininfor
 -- ----------------------------
-INSERT INTO `sys_logininfor` VALUES (1, 'admin', '127.0.0.1', '内网IP', 'Chrome 10', 'Windows 10', '0', '登录成功', '2023-02-03 15:49:58');
-INSERT INTO `sys_logininfor` VALUES (2, 'admin', '127.0.0.1', '内网IP', 'Chrome 10', 'Windows 10', '0', '登录成功', '2023-02-03 16:02:44');
-INSERT INTO `sys_logininfor` VALUES (3, 'admin', '127.0.0.1', '内网IP', 'Chrome 10', 'Windows 10', '0', '登录成功', '2023-02-17 17:02:26');
-INSERT INTO `sys_logininfor` VALUES (4, 'admin', '127.0.0.1', '内网IP', 'Chrome 10', 'Windows 10', '0', '退出成功', '2023-02-17 17:03:00');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -1470,14 +1469,16 @@ CREATE TABLE `sys_oper_log`  (
   `status` int(1) NULL DEFAULT 0 COMMENT '操作状态（0正常 1异常）',
   `error_msg` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '错误消息',
   `oper_time` datetime NULL DEFAULT NULL COMMENT '操作时间',
-  `cost_time` bigint(20) NULL DEFAULT NULL COMMENT '消耗时间',
-  PRIMARY KEY (`oper_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '操作日志记录' ROW_FORMAT = Dynamic;
+  `cost_time` bigint(20) NULL DEFAULT 0 COMMENT '消耗时间',
+  PRIMARY KEY (`oper_id`) USING BTREE,
+  INDEX `idx_sys_oper_log_bt`(`business_type`) USING BTREE,
+  INDEX `idx_sys_oper_log_s`(`status`) USING BTREE,
+  INDEX `idx_sys_oper_log_ot`(`oper_time`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 100 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '操作日志记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_oper_log
 -- ----------------------------
-INSERT INTO `sys_oper_log` VALUES (1, '操作日志', 9, 'com.ruoyi.project.monitor.operlog.controller.OperlogController.clean()', 'POST', 1, 'admin', '若依', '/monitor/operlog/clean', '127.0.0.1', '内网IP', '', '{\"msg\":\"操作成功\",\"code\":0}', 0, NULL, '2023-02-17 17:02:53', 438);
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -1618,7 +1619,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 100, 'admin', '管理员', '00', 'ry@163.com', '18888888888', '1', '', 'fa9448fecf4bf7414ab433408d05eb39', '820e6f', '0', '0', '127.0.0.1', '2023-02-17 17:02:26', '2023-02-03 09:46:34', 'admin', '2022-01-24 14:31:49', '', '2023-02-17 17:02:26', '管理员');
+INSERT INTO `sys_user` VALUES (1, 100, 'admin', '管理员', '00', 'ry@163.com', '18888888888', '1', '', 'fa9448fecf4bf7414ab433408d05eb39', '820e6f', '0', '0', '127.0.0.1', '2023-02-21 14:12:37', '2023-02-03 09:46:34', 'admin', '2022-01-24 14:31:49', '', '2023-02-21 14:12:36', '管理员');
 INSERT INTO `sys_user` VALUES (2, 101, 'zhangsan', '张三', '00', 'zhangsan@qq.com', '', '0', '', 'dc1d68db72acd7e6660eb512da091d44', '511eb5', '0', '0', '127.0.0.1', '2023-02-03 15:30:12', NULL, 'admin', '2023-02-03 14:27:02', '', '2023-02-03 15:30:12', NULL);
 INSERT INTO `sys_user` VALUES (3, 101, 'baba', '张三主管', '00', 'baba@qq.com', '', '0', '', '0eb18a4fd5eec318b03467608480d8d8', '268cde', '0', '0', '127.0.0.1', '2023-02-03 15:30:17', NULL, 'admin', '2023-02-03 14:27:53', '', '2023-02-03 15:30:17', NULL);
 
@@ -1644,6 +1645,7 @@ CREATE TABLE `sys_user_online`  (
 -- ----------------------------
 -- Records of sys_user_online
 -- ----------------------------
+INSERT INTO `sys_user_online` VALUES ('4c5de36e-17ca-4167-8ee8-54ebc00c93a7', 'admin', '若依', '127.0.0.1', '内网IP', 'Chrome 10', 'Windows 10', 'on_line', '2023-02-21 14:12:02', '2023-02-21 14:12:37', 1800000);
 
 -- ----------------------------
 -- Table structure for sys_user_post
