@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
@@ -15,15 +17,20 @@ import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.common.utils.text.Convert;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
+import com.ruoyi.project.system.dict.domain.DictData;
+import com.ruoyi.project.system.dict.mapper.DictDataMapper;
 import com.ruoyi.project.system.role.domain.Role;
+import com.ruoyi.project.system.role.domain.RoleAct;
 import com.ruoyi.project.system.role.domain.RoleDept;
 import com.ruoyi.project.system.role.domain.RoleMenu;
+import com.ruoyi.project.system.role.mapper.RoleActMapper;
 import com.ruoyi.project.system.role.mapper.RoleDeptMapper;
 import com.ruoyi.project.system.role.mapper.RoleMapper;
 import com.ruoyi.project.system.role.mapper.RoleMenuMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.domain.UserRole;
 import com.ruoyi.project.system.user.mapper.UserRoleMapper;
+import com.ruoyi.project.tool.hutool.IdGeneratorSnowflake;
 
 /**
  * 角色 业务层处理
@@ -44,6 +51,15 @@ public class RoleServiceImpl implements IRoleService
 
     @Autowired
     private RoleDeptMapper roleDeptMapper;
+
+    @Autowired
+    private IdGeneratorSnowflake idGeneratorSnowflake;
+    
+    @Autowired
+    private RoleActMapper roleActMapper;
+    
+    @Autowired
+    private DictDataMapper dictDataMapper;
 
     /**
      * 根据条件分页查询角色数据
@@ -124,7 +140,27 @@ public class RoleServiceImpl implements IRoleService
     @Override
     public Role selectRoleById(Long roleId)
     {
-        return roleMapper.selectRoleById(roleId);
+    	Role role = roleMapper.selectRoleById(roleId);
+    	
+    	RoleAct map = new RoleAct();
+    	map.setRoleId(roleId);
+    	List<RoleAct> roleActList = roleActMapper.selectRoleActList(map);
+    	List<DictData> dictDatas = dictDataMapper.selectDictDataByType("act_type");
+    	List<RoleAct> roleActs = new ArrayList<RoleAct>();
+    	for (DictData dictData : dictDatas) {
+    		RoleAct temp = new RoleAct();
+    		temp.setActName(dictData.getDictLabel());
+    		temp.setActValue(dictData.getDictValue());
+    		for (RoleAct roleAct : roleActList) {
+    			if (dictData.getDictValue().equals(roleAct.getActValue())) {
+    				temp.setFlag(true);
+				}
+			}
+    		roleActs.add(temp);
+		}
+    	
+    	role.setRoleActs(roleActs);
+        return role;
     }
 
     /**
@@ -141,6 +177,7 @@ public class RoleServiceImpl implements IRoleService
         roleMenuMapper.deleteRoleMenuByRoleId(roleId);
         // 删除角色与部门关联
         roleDeptMapper.deleteRoleDeptByRoleId(roleId);
+        roleActMapper.deleteRoleActByRoleId(roleId);
         return roleMapper.deleteRoleById(roleId) > 0 ? true : false;
     }
 
@@ -169,6 +206,7 @@ public class RoleServiceImpl implements IRoleService
         roleMenuMapper.deleteRoleMenu(roleIds);
         // 删除角色与部门关联
         roleDeptMapper.deleteRoleDept(roleIds);
+        roleActMapper.deleteRoleAct(roleIds);
         return roleMapper.deleteRoleByIds(roleIds);
     }
 
@@ -185,6 +223,7 @@ public class RoleServiceImpl implements IRoleService
         role.setCreateBy(ShiroUtils.getLoginName());
         // 新增角色信息
         roleMapper.insertRole(role);
+        insertRoleAct(role);
         return insertRoleMenu(role);
     }
 
@@ -203,6 +242,10 @@ public class RoleServiceImpl implements IRoleService
         roleMapper.updateRole(role);
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId(role.getRoleId());
+        
+        roleActMapper.deleteRoleActByRoleId(role.getRoleId());
+        insertRoleAct(role);
+        
         return insertRoleMenu(role);
     }
 
@@ -413,5 +456,24 @@ public class RoleServiceImpl implements IRoleService
             list.add(ur);
         }
         return userRoleMapper.batchUserRole(list);
+    }
+    
+    public int insertRoleAct(Role role)
+    {
+    	int rows = 1;
+    	String[] actTypes = role.getActTypes();
+    	List<RoleAct> list = new ArrayList<RoleAct>();
+    	for (String actType : actTypes) {
+    		RoleAct roleAct = new RoleAct();
+    		roleAct.setId(idGeneratorSnowflake.nextId());
+    		roleAct.setRoleId(role.getRoleId());
+    		roleAct.setActValue(actType);
+    		list.add(roleAct);
+		}
+    	if (list.size() > 0)
+        {
+            rows = roleActMapper.batchRoleAct(list);
+        }
+        return rows;
     }
 }
