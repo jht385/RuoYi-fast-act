@@ -365,7 +365,7 @@ var table = {
                 if ($.common.isNotEmpty(pageSize)) {
                     params.pageSize = pageSize;
                 }
-                if ($.common.isNotEmpty(tableId)){
+                if ($.common.isNotEmpty(tableId)) {
                     $("#" + tableId).bootstrapTable('refresh', params);
                 } else{
                     $("#" + table.options.id).bootstrapTable('refresh', params);
@@ -425,7 +425,7 @@ var table = {
                     shadeClose: true,
                     btn1: function(index, layero){
                         var file = layero.find('#file').val();
-                        if (file == '' || (!$.common.endWith(file, '.xls') && !$.common.endWith(file, '.xlsx'))){
+                        if (file == '' || (!$.common.endWith(file, '.xls') && !$.common.endWith(file, '.xlsx'))) {
                             $.modal.msgWarning("请选择后缀为 “xls”或“xlsx”的文件。");
                             return false;
                         }
@@ -806,7 +806,7 @@ var table = {
             },
             // 获取iframe页的DOM
             getChildFrame: function (index) {
-                if ($.common.isEmpty(index)){
+                if ($.common.isEmpty(index)) {
                     var index = parent.layer.getFrameIndex(window.name);
                     return parent.layer.getChildFrame('body', index);
                 } else {
@@ -815,7 +815,7 @@ var table = {
             },
             // 关闭窗体
             close: function (index) {
-                if ($.common.isEmpty(index)){
+                if ($.common.isEmpty(index)) {
                     var index = parent.layer.getFrameIndex(window.name);
                     parent.layer.close(index);
                 } else {
@@ -989,6 +989,26 @@ var table = {
                 createMenuItem(url, title);
                 closeItem(dataId);
             },
+            // 右侧弹出窗口打开
+            popupRight: function(title, url){
+                var width = 150;
+                if (top.location !== self.location) {
+                    if ($(top.window).outerWidth() < 400) {
+                        width = 50;
+                    }
+                }
+                top.layer.open({
+                    type: 2,
+                    offset: 'r',
+                    anim: 'slideLeft',
+                    move: false,
+                    title: title,
+                    shade: 0.3,
+                    shadeClose: true,
+                    area: [($(window).outerWidth() - width) + 'px', '100%'],
+                    content: url
+                });
+            },
             // 关闭选项卡
             closeTab: function (dataId) {
                 closeItem(dataId);
@@ -1056,8 +1076,7 @@ var table = {
                     width: width,
                     height: height,
                     url: _url,
-                    skin: 'layui-layer-gray', 
-                    btn: ['关闭'],
+                    btn: 0,
                     yes: function (index, layero) {
                         $.modal.close(index);
                     }
@@ -1194,6 +1213,12 @@ var table = {
                     url = table.options.updateUrl.replace("{id}", id);
                 }
                 return url;
+            },
+            // 右侧弹出详情
+            view: function(id){
+                table.set();
+                var url = table.options.viewUrl.replace("{id}", id);
+                $.modal.popupRight(table.options.modalName + "信息详情", url);
             },
             // 保存信息 刷新表格
             save: function(url, data, callback) {

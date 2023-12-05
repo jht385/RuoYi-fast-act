@@ -154,6 +154,20 @@ public class UserController extends BaseController
         mmap.put("posts", postService.selectPostsByUserId(userId));
         return prefix + "/edit";
     }
+    
+    /**
+     * 查询用户详细
+     */
+    @RequiresPermissions("system:user:list")
+    @GetMapping("/view/{userId}")
+    public String view(@PathVariable("userId") Long userId, ModelMap mmap)
+    {
+        userService.checkUserDataScope(userId);
+        mmap.put("user", userService.selectUserById(userId));
+        mmap.put("roleGroup", userService.selectUserRoleGroup(userId));
+        mmap.put("postGroup", userService.selectUserPostGroup(userId));
+        return prefix + "/view";
+    }
 
     /**
      * 修改保存用户
