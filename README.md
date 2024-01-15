@@ -5,7 +5,7 @@
 ## 项目基于 ruoyi单应用项目 二次开发得来
 [原项目](https://gitee.com/y_project/RuoYi) [单应用项目](https://github.com/yangzongzhuan/RuoYi-fast)  
 
-## 我给的
+## 我修改的
 1.  登录按环境确认是否默认填上用户名密码
 2.  增加打印pid的工具类，因为我用着windows运行ry.bat经常关闭不了进程，打印出来方便任务管理器关闭
 3.  增加hutool；用他的雪花算法生成id（！如果要使用，生成代码时，业务id要选成string）；发邮件

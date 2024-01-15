@@ -3,15 +3,20 @@ package com.ruoyi.project.system.user.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.validation.Validator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.Md5Utils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.common.utils.security.ShiroUtils;
@@ -217,6 +222,7 @@ public class UserServiceImpl implements IUserService
     {
         user.randomSalt();
         user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
+        user.setPwdUpdateDate(DateUtils.getNowDate());
         user.setCreateBy(ShiroUtils.getLoginName());
         // 新增用户信息
         int rows = userMapper.insertUser(user);
@@ -508,10 +514,10 @@ public class UserServiceImpl implements IUserService
                 if (StringUtils.isNull(u))
                 {
                     BeanValidators.validateWithException(validator, user);
-                    user.setPassword(password);
+                    user.setPassword(Md5Utils.hash(user.getLoginName() + password));
                     user.setCreateBy(operName);
                     userMapper.insertUser(user);
-                    successNum++;
+                    successNum++;	
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
                 }
                 else if (isUpdateSupport)

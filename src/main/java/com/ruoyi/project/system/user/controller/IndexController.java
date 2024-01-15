@@ -2,8 +2,10 @@ package com.ruoyi.project.system.user.controller;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.ruoyi.common.constant.ShiroConstants;
 import com.ruoyi.common.utils.CookieUtils;
 import com.ruoyi.common.utils.DateUtils;
@@ -21,6 +24,8 @@ import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.shiro.service.PasswordService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.activiti.domain.TaskVO;
+import com.ruoyi.project.activiti.service.IProcessWorkService;
 import com.ruoyi.project.system.config.service.IConfigService;
 import com.ruoyi.project.system.menu.domain.Menu;
 import com.ruoyi.project.system.menu.service.IMenuService;
@@ -45,6 +50,9 @@ public class IndexController extends BaseController
 
     @Autowired
     private RuoYiConfig ruoYiConfig;
+    
+    @Autowired
+    private IProcessWorkService processWorkService;
 
     // 系统首页
     @GetMapping("/index")
@@ -68,6 +76,8 @@ public class IndexController extends BaseController
         mmap.put("isDefaultModifyPwd", initPasswordIsModify(user.getPwdUpdateDate()));
         mmap.put("isPasswordExpired", passwordIsExpiration(user.getPwdUpdateDate()));
         mmap.put("isMobile", ServletUtils.checkAgentIsMobile(ServletUtils.getRequest().getHeader("User-Agent")));
+        Long total = processWorkService.todoListSize(new TaskVO());
+		mmap.put("actTotal", total.intValue());
 
         // 菜单导航显示风格
         String menuStyle = configService.selectConfigByKey("sys.index.menuStyle");
