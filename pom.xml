@@ -35,7 +35,7 @@
         <kaptcha.version>2.3.3</kaptcha.version>
         <swagger.version>3.0.0</swagger.version>
         <poi.version>4.1.2</poi.version>
-        <oshi.version>6.4.8</oshi.version>
+        <oshi.version>6.5.0</oshi.version>
         
         <activiti.version>6.0.0</activiti.version>
         <hutool.version>5.7.21</hutool.version>
@@ -194,7 +194,7 @@
             <version>${kaptcha.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <artifactId>servlet-api</artifactId>
                     <groupId>javax.servlet</groupId>
                 </exclusion>
             </exclusions>
