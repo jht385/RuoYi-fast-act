@@ -25,6 +25,7 @@ import com.ruoyi.common.utils.text.Convert;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.framework.shiro.service.PasswordService;
 import com.ruoyi.project.system.config.service.IConfigService;
+import com.ruoyi.project.system.dept.service.IDeptService;
 import com.ruoyi.project.system.post.domain.Post;
 import com.ruoyi.project.system.post.mapper.PostMapper;
 import com.ruoyi.project.system.role.domain.Role;
@@ -67,6 +68,9 @@ public class UserServiceImpl implements IUserService
     @Autowired
     private PasswordService passwordService;
 
+    @Autowired
+    private IDeptService deptService;
+    
     @Autowired
     protected Validator validator;
 
@@ -504,7 +508,6 @@ public class UserServiceImpl implements IUserService
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
         String operName = ShiroUtils.getLoginName();
-        String password = configService.selectConfigByKey("sys.user.initPassword");
         for (User user : userList)
         {
             try
@@ -514,6 +517,8 @@ public class UserServiceImpl implements IUserService
                 if (StringUtils.isNull(u))
                 {
                     BeanValidators.validateWithException(validator, user);
+                    deptService.checkDeptDataScope(user.getDeptId());
+                    String password = configService.selectConfigByKey("sys.user.initPassword");
                     user.setPassword(Md5Utils.hash(user.getLoginName() + password));
                     user.setCreateBy(operName);
                     userMapper.insertUser(user);
@@ -525,6 +530,7 @@ public class UserServiceImpl implements IUserService
                     BeanValidators.validateWithException(validator, user);
                     checkUserAllowed(u);
                     checkUserDataScope(u.getUserId());
+                    deptService.checkDeptDataScope(user.getDeptId());
                     user.setUserId(u.getUserId());
                     user.setUpdateBy(operName);
                     userMapper.updateUser(user);

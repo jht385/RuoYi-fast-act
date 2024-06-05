@@ -29,14 +29,14 @@
         <thymeleaf.extras.shiro.version>2.1.0</thymeleaf.extras.shiro.version>
         <pagehelper.spring.boot.starter.version>1.4.7</pagehelper.spring.boot.starter.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <druid.version>1.2.20</druid.version>
+        <druid.version>1.2.23</druid.version>
         <commons.io.version>2.13.0</commons.io.version>
         <bitwalker.version>1.21</bitwalker.version>
         <velocity.version>2.3</velocity.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <swagger.version>3.0.0</swagger.version>
         <poi.version>4.1.2</poi.version>
-        <oshi.version>6.5.0</oshi.version>
+        <oshi.version>6.6.1</oshi.version>
         
         <activiti.version>6.0.0</activiti.version>
         <hutool.version>5.7.21</hutool.version>
@@ -342,6 +342,7 @@
                         <exclude>**/*.min.js</exclude>
                         <exclude>**/*.min.css</exclude>
                         <exclude>**/fileinput.js</exclude>
+                        <exclude>**/validate/**</exclude>
                         <exclude>**/bootstrap-table/**</exclude>
                     </excludes>
                 </configuration>
