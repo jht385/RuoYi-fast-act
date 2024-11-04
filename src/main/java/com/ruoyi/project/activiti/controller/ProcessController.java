@@ -20,6 +20,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -97,15 +98,21 @@ public class ProcessController extends BaseController {
 			for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
 				highLightedActivitiIds.add(historicActivityInstance.getActivityId());
 			}
+			ProcessDiagramGenerator processDiagramGenerator = processEngine.getProcessEngineConfiguration()
+					.getProcessDiagramGenerator();
 			BpmnModel bpmnModel = repositoryService.getBpmnModel(historicProcessInstance.getProcessDefinitionId());
 			List<String> highLightedFlowIds = getHighLightedFlows(bpmnModel, historicActivityInstances);// 高亮流程已发生流转的线id集合
-			ICustomProcessDiagramGenerator diagramGenerator = (ICustomProcessDiagramGenerator) processEngine
-					.getProcessEngineConfiguration().getProcessDiagramGenerator();
-			Set<String> currIds = runtimeService.createExecutionQuery().processInstanceId(pProcessInstanceId).list()
-					.stream().map(e -> e.getActivityId()).collect(Collectors.toSet());
-			InputStream imageStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivitiIds,
-					highLightedFlowIds, "宋体", "宋体", "宋体", null, 1.0,
-					new Color[] { WorkflowConstants.COLOR_NORMAL, WorkflowConstants.COLOR_CURRENT }, currIds);
+			InputStream imageStream = processDiagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivitiIds,
+					highLightedFlowIds, "宋体", "微软雅黑", "黑体", null, 1.0);
+			
+			// 这个有问题，在服务器显示不出来
+//			ICustomProcessDiagramGenerator diagramGenerator = (ICustomProcessDiagramGenerator) processEngine
+//					.getProcessEngineConfiguration().getProcessDiagramGenerator();
+//			Set<String> currIds = runtimeService.createExecutionQuery().processInstanceId(pProcessInstanceId).list()
+//					.stream().map(e -> e.getActivityId()).collect(Collectors.toSet());
+//			InputStream imageStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivitiIds,
+//					highLightedFlowIds, "宋体", "宋体", "宋体", null, 1.0,
+//					new Color[] { WorkflowConstants.COLOR_NORMAL, WorkflowConstants.COLOR_CURRENT }, currIds);
 
 			byte[] b = new byte[1024];
 			int len;
