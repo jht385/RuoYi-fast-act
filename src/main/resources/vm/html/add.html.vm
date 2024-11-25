@@ -214,7 +214,7 @@
 #end
 #end
     <script th:inline="javascript">
-        var prefix = ctx + "${moduleName}/${businessName}"
+        var prefix = ctx + "${moduleName}/${businessName}";
 #if($table.sub)
 #foreach($column in $subTable.columns)
 #if(${column.dictType} != '')
