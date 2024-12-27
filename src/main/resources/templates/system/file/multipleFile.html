@@ -25,6 +25,16 @@
         $("#multipleFile").fileinput({
             uploadUrl: ctx + 'common/uploads',
             uploadAsync: false
+        }).on('filebatchpreupload', function(event, data) {
+            // 遍历所有文件，检查文件名
+            for (var i = 0; i < data.files.length; i++) {
+                var fileName = data.files[i].name;
+                if (fileName.includes(',') || fileName.includes(';') || fileName.includes('，') || fileName.includes('；')) {
+                    alert('文件名不能包含逗号或分号。');
+                    event.preventDefault(); // 阻止事件默认行为，即阻止批量上传
+                    return; // 退出循环
+                }
+            }
         }).on('filebatchuploadsuccess', function (event, data, previewId, index) {
         	var files = data.files; // 上传的文件信息
         	/*
