@@ -3,7 +3,7 @@ ruoyi:
   # 名称
   name: ry-fast-act
   # 版本
-  version: 4.7.9
+  version: 4.8.0
   # 版权年份
   copyrightYear: 2024
   # 实例演示开关
@@ -160,3 +160,5 @@ gen:
   autoRemovePre: true
   # 表前缀（生成类名不会包含表前缀，多个用逗号分隔）
   tablePrefix: sys_
+  # 是否允许生成文件覆盖到本地（自定义路径），默认不允许
+  allowOverwrite: false
