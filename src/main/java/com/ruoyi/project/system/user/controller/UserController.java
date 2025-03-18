@@ -108,6 +108,7 @@ public class UserController extends BaseController
     /**
      * 新增用户
      */
+    @RequiresPermissions("system:user:add")
     @GetMapping("/add")
     public String add(ModelMap mmap)
     {
@@ -125,7 +126,7 @@ public class UserController extends BaseController
     @ResponseBody
     public AjaxResult addSave(@Validated User user)
     {
-    	deptService.checkDeptDataScope(user.getDeptId());
+        deptService.checkDeptDataScope(user.getDeptId());
         roleService.checkRoleDataScope(user.getRoleIds());
         if (!userService.checkLoginNameUnique(user))
         {
@@ -156,7 +157,7 @@ public class UserController extends BaseController
         mmap.put("posts", postService.selectPostsByUserId(userId));
         return prefix + "/edit";
     }
-    
+
     /**
      * 查询用户详细
      */
