@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.Filter;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.security.CipherUtils;
@@ -31,6 +34,7 @@ import com.ruoyi.framework.shiro.rememberMe.CustomCookieRememberMeManager;
 import com.ruoyi.framework.shiro.session.OnlineSessionDAO;
 import com.ruoyi.framework.shiro.session.OnlineSessionFactory;
 import com.ruoyi.framework.shiro.web.CustomShiroFilterFactoryBean;
+import com.ruoyi.framework.shiro.web.csrf.CsrfValidateFilter;
 import com.ruoyi.framework.shiro.web.filter.LogoutFilter;
 import com.ruoyi.framework.shiro.web.filter.captcha.CaptchaValidateFilter;
 import com.ruoyi.framework.shiro.web.filter.kickout.KickoutSessionFilter;
@@ -38,6 +42,7 @@ import com.ruoyi.framework.shiro.web.filter.online.OnlineSessionFilter;
 import com.ruoyi.framework.shiro.web.filter.sync.SyncOnlineSessionFilter;
 import com.ruoyi.framework.shiro.web.session.OnlineWebSessionManager;
 import com.ruoyi.framework.shiro.web.session.SpringSessionValidationScheduler;
+
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 
 /**
@@ -131,6 +136,18 @@ public class ShiroConfig
      */
     @Value("${shiro.rememberMe.enabled: false}")
     private boolean rememberMe;
+
+    /**
+     * 是否开启csrf
+     */
+    @Value("${csrf.enabled: false}")
+    private boolean csrfEnabled;
+
+    /**
+     * csrf白名单链接
+     */
+    @Value("${csrf.whites: ''}")
+    private String csrfWhites;
 
     /**
      * 缓存管理器 使用Ehcache实现
@@ -264,6 +281,17 @@ public class ShiroConfig
     }
 
     /**
+     * csrf过滤器
+     */
+    public CsrfValidateFilter csrfValidateFilter()
+    {
+        CsrfValidateFilter csrfValidateFilter = new CsrfValidateFilter();
+        csrfValidateFilter.setEnabled(csrfEnabled);
+        csrfValidateFilter.setCsrfWhites(StringUtils.str2List(csrfWhites, ","));
+        return csrfValidateFilter;
+    }
+
+    /**
      * Shiro过滤器配置
      */
     @Bean
@@ -309,13 +337,14 @@ public class ShiroConfig
         filters.put("onlineSession", onlineSessionFilter());
         filters.put("syncOnlineSession", syncOnlineSessionFilter());
         filters.put("captchaValidate", captchaValidateFilter());
+        filters.put("csrfValidateFilter", csrfValidateFilter());
         filters.put("kickout", kickoutSessionFilter());
         // 注销成功，则跳转到指定页面
         filters.put("logout", logoutFilter());
         shiroFilterFactoryBean.setFilters(filters);
 
         // 所有请求需要认证
-        filterChainDefinitionMap.put("/**", "user,kickout,onlineSession,syncOnlineSession");
+        filterChainDefinitionMap.put("/**", "user,kickout,onlineSession,syncOnlineSession,csrfValidateFilter");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
         return shiroFilterFactoryBean;
