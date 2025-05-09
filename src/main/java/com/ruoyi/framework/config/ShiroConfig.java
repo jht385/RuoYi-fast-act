@@ -155,7 +155,7 @@ public class ShiroConfig
     @Bean
     public EhCacheManager getEhCacheManager()
     {
-        net.sf.ehcache.CacheManager cacheManager = net.sf.ehcache.CacheManager.getCacheManager("ruoyi");
+        net.sf.ehcache.CacheManager cacheManager = net.sf.ehcache.CacheManager.getCacheManager("ry-fast-act");
         EhCacheManager em = new EhCacheManager();
         if (StringUtils.isNull(cacheManager))
         {
