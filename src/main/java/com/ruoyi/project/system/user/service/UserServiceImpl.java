@@ -3,17 +3,14 @@ package com.ruoyi.project.system.user.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
@@ -73,7 +70,7 @@ public class UserServiceImpl implements IUserService
 
     @Autowired
     private IDeptService deptService;
-    
+
     @Autowired
     protected Validator validator;
 
@@ -288,6 +285,18 @@ public class UserServiceImpl implements IUserService
     public int updateUserInfo(User user)
     {
         return userMapper.updateUser(user);
+    }
+
+    /**
+     * 修改用户头像
+     * 
+     * @param userId 用户ID
+     * @param avatar 头像地址
+     * @return 结果
+     */
+    public boolean updateUserAvatar(Long userId, String avatar)
+    {
+        return userMapper.updateUserAvatar(userId, avatar) > 0;
     }
 
     /**
@@ -525,7 +534,7 @@ public class UserServiceImpl implements IUserService
                     user.setPassword(Md5Utils.hash(user.getLoginName() + password));
                     user.setCreateBy(operName);
                     userMapper.insertUser(user);
-                    successNum++;	
+                    successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
                 }
                 else if (isUpdateSupport)
@@ -555,8 +564,6 @@ public class UserServiceImpl implements IUserService
                     loginName = EscapeUtil.clean(loginName);
                 }
                 String msg = "<br/>" + failureNum + "、账号 " + loginName + " 导入失败：";
-                failureMsg.append(msg + e.getMessage());
-                log.error(msg, e);
                 failureMsg.append(msg + e.getMessage());
                 log.error(msg, e);
             }

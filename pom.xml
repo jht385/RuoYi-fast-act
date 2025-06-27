@@ -5,7 +5,7 @@
 
     <groupId>com.ruoyi</groupId>
     <artifactId>RuoYi-fast-act</artifactId>
-    <version>4.8.0</version>
+    <version>4.8.1</version>
     <packaging>jar</packaging>
 
     <name>RuoYi-fast-act</name>
@@ -29,15 +29,15 @@
         <pagehelper.spring.boot.starter.version>1.4.7</pagehelper.spring.boot.starter.version>
         <fastjson.version>1.2.83</fastjson.version>
         <druid.version>1.2.23</druid.version>
-        <commons.io.version>2.16.1</commons.io.version>
+        <commons.io.version>2.19.0</commons.io.version>
         <bitwalker.version>1.21</bitwalker.version>
         <velocity.version>2.3</velocity.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <swagger.version>3.0.0</swagger.version>
         <poi.version>4.1.2</poi.version>
-        <oshi.version>6.6.5</oshi.version>
+        <oshi.version>6.8.2</oshi.version>
         <!-- override dependency version -->
-        <tomcat.version>9.0.102</tomcat.version>
+        <tomcat.version>9.0.106</tomcat.version>
         <logback.version>1.2.13</logback.version>
         <spring-framework.version>5.3.39</spring-framework.version>
         <activiti.version>6.0.0</activiti.version>

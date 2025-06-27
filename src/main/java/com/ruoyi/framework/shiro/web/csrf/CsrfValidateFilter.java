@@ -1,4 +1,4 @@
-package com.ruoyi.framework.shiro.web.csrf;
+package com.ruoyi.framework.shiro.web.filter.csrf;
 
 import java.util.List;
 import javax.servlet.ServletRequest;
@@ -37,7 +37,7 @@ public class CsrfValidateFilter extends AccessControlFilter
         {
             return true;
         }
-        return validateResponse(httpServletRequest, httpServletRequest.getHeader(ShiroConstants.CSRF_TOKEN));
+        return validateResponse(httpServletRequest, httpServletRequest.getHeader(ShiroConstants.X_CSRF_TOKEN));
     }
 
     public boolean validateResponse(HttpServletRequest request, String requestToken)
