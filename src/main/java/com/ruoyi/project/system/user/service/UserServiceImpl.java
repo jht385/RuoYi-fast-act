@@ -299,7 +299,7 @@ public class UserServiceImpl implements IUserService
     {
         return userMapper.updateUserAvatar(userId, avatar) > 0;
     }
-    
+
     /**
      * 更新用户登录信息（IP和登录时间）
      * 
@@ -469,7 +469,7 @@ public class UserServiceImpl implements IUserService
     @Override
     public void checkUserDataScope(Long userId)
     {
-        if (!User.isAdmin(ShiroUtils.getUserId()))
+        if (!ShiroUtils.isAdmin())
         {
             User user = new User();
             user.setUserId(userId);
@@ -604,6 +604,6 @@ public class UserServiceImpl implements IUserService
     @Override
     public int changeStatus(User user)
     {
-    	return userMapper.updateUserStatus(user.getUserId(), user.getStatus());
+        return userMapper.updateUserStatus(user.getUserId(), user.getStatus());
     }
 }

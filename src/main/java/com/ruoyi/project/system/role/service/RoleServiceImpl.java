@@ -374,7 +374,7 @@ public class RoleServiceImpl implements IRoleService
     @Override
     public void checkRoleDataScope(Long... roleIds)
     {
-        if (!User.isAdmin(ShiroUtils.getUserId()))
+        if (!ShiroUtils.isAdmin())
         {
             for (Long roleId : roleIds)
             {
