@@ -1,4 +1,4 @@
-package com.ruoyi.framework.shiro.web.csrf;
+package com.ruoyi.framework.shiro.web.filter.csrf;
 
 import java.util.List;
 import javax.servlet.ServletRequest;
